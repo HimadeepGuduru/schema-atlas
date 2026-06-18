@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schema Atlas</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f6f7f9;
+    --bg-strip: #11192e;
+    --border: #e2e4e9;
+    --text: #1c1f26;
+    --text-soft: #5b6270;
+    --text-faint: #8a8f9b;
+    --accent: #2f5fb3;
+    --accent-soft: #eaf0fb;
+    --accent-text: #1e3f7d;
+    --md: #1d7a4c;
+    --md-soft: #e3f3ea;
+    --lookup: #2f5fb3;
+    --lookup-soft: #eaf0fb;
+    --warn: #9a5b12;
+    --warn-soft: #fbf0e1;
+    --mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg-soft);
+  }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  header h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  header h1 span { color: var(--text-faint); font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .env-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .env-toggle button {
+    border: none; background: var(--bg); padding: 7px 14px; font-size: 13px; cursor: pointer; color: var(--text-soft);
+  }
+  .env-toggle button.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+  .btn {
+    border: 1px solid var(--accent); background: var(--accent); color: #fff;
+    padding: 8px 16px; border-radius: var(--radius); font-size: 13px; cursor: pointer; font-weight: 500;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn.secondary { background: var(--bg); color: var(--accent-text); border-color: var(--border); }
+  .conn-status { margin-left: auto; font-size: 13px; color: var(--text-soft); display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); }
+  .dot.live { background: var(--md); }
+  main { max-width: 1080px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
+  .card h2 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+  .card .sub { font-size: 12px; color: var(--text-soft); margin: 0 0 16px; }
+  .key-field { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+  .key-field input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--mono); font-size: 12px; }
+  .scope-options { display: flex; gap: 10px; flex-wrap: wrap; }
+  .scope-card {
+    flex: 1; min-width: 160px; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 14px; cursor: pointer; font-size: 13px;
+  }
+  .scope-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .scope-card strong { display: block; margin-bottom: 2px; }
+  .scope-card span { color: var(--text-soft); font-size: 12px; }
+  #subset-panel { margin-top: 14px; display: none; }
+  #subset-panel.open { display: block; }
+  #subset-search { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; margin-bottom: 8px; }
+  #subset-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  .subset-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .subset-row:last-child { border-bottom: none; }
+  .subset-row code { font-family: var(--mono); font-size: 12px; }
+  .subset-row .lbl { color: var(--text-soft); font-size: 12px; }
+  .subset-actions { display: flex; gap: 8px; margin-bottom: 8px; }
+  .subset-actions a { font-size: 12px; color: var(--accent); cursor: pointer; }
+  .stats-strip {
+    position: sticky; top: 57px; z-index: 15; background: var(--bg-strip); color: #fff;
+    border-radius: 10px; padding: 12px 20px; display: none; gap: 28px;
+  }
+  .stats-strip.show { display: flex; }
+  .stat b { font-size: 16px; display: block; }
+  .stat span { font-size: 11px; color: #aab3c8; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .tab { padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--text-soft); border-bottom: 2px solid transparent; }
+  .tab.active { color: var(--accent-text); border-bottom-color: var(--accent); font-weight: 600; }
+  .table-search { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; padding: 8px 10px; background: var(--bg-soft); color: var(--text-soft); font-weight: 600; position: sticky; top: 0; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  td.mono, th.mono { font-family: var(--mono); }
+  .table-wrap { max-height: 420px; overflow: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+  .badge.md { background: var(--md-soft); color: var(--md); }
+  .badge.lookup { background: var(--lookup-soft); color: var(--lookup); }
+  .badge.junction { background: var(--warn-soft); color: var(--warn); }
+  .export-row { display: flex; gap: 10px; margin-top: 16px; }
+  .empty { color: var(--text-faint); font-size: 13px; padding: 30px; text-align: center; }
+  .progress { font-size: 12px; color: var(--text-soft); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Schema Atlas <span>org schema extraction &amp; export</span></h1>
+  <div class="env-toggle">
+    <button id="env-sandbox" class="active">Sandbox</button>
+    <button id="env-prod">Production</button>
+  </div>
+  <button class="btn" id="connect-btn">Connect to Salesforce</button>
+  <div class="conn-status"><span class="dot" id="conn-dot"></span><span id="conn-label">Not connected</span></div>
+</header>
+
+<main>
+
+  <div class="card" id="key-card">
+    <h2>Connected app key</h2>
+    <p class="sub">Reuses the same connected app as your other tools. Paste the consumer key once — it's saved only in this browser, never committed.</p>
+    <div class="key-field">
+      <input type="text" id="consumer-key-input" placeholder="Connected app consumer key">
+      <button class="btn secondary" id="save-key-btn">Save</button>
+    </div>
+  </div>
+
+  <div class="card" id="scope-card" style="display:none">
+    <h2>1. Choose what to extract</h2>
+    <p class="sub" id="object-count-sub"></p>
+    <div class="scope-options">
+      <div class="scope-card" data-scope="all"><strong>Entire schema</strong><span>Every object you can see</span></div>
+      <div class="scope-card selected" data-scope="custom"><strong>Custom objects only</strong><span>Anything ending in __c</span></div>
+      <div class="scope-card" data-scope="subset"><strong>Specific subset</strong><span>Pick objects by name</span></div>
+    </div>
+    <div id="subset-panel">
+      <div class="subset-actions"><a id="subset-select-all">Select all visible</a><a id="subset-clear">Clear</a></div>
+      <input type="text" id="subset-search" placeholder="Search objects by API name or label">
+      <div id="subset-list"></div>
+    </div>
+    <button class="btn" id="extract-btn" style="margin-top:16px">Extract schema</button>
+    <div class="progress" id="progress-label"></div>
+  </div>
+
+  <div class="stats-strip" id="stats-strip">
+    <div class="stat"><b id="stat-objects">0</b><span>Objects</span></div>
+    <div class="stat"><b id="stat-fields">0</b><span>Fields</span></div>
+    <div class="stat"><b id="stat-rel">0</b><span>Relationships</span></div>
+    <div class="stat"><b id="stat-junction">0</b><span>Likely junctions</span></div>
+  </div>
+
+  <div class="card" id="preview-card" style="display:none">
+    <div class="tabs">
+      <div class="tab active" data-tab="dict">Data dictionary</div>
+      <div class="tab" data-tab="matrix">Relationship matrix</div>
+    </div>
+    <input type="text" class="table-search" id="dict-search" placeholder="Filter by object, field, or type">
+    <div class="table-wrap" id="dict-wrap"></div>
+    <div class="table-wrap" id="matrix-wrap" style="display:none"></div>
+    <div class="export-row">
+      <button class="btn" id="export-excel-btn">Download Excel workbook</button>
+      <button class="btn secondary" id="export-lucid-btn">Download Lucidchart CSV</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+/*
+  Setup checklist (same pattern as the other tools in the toolkit):
+  1. Reuse the existing connected app (or create a dedicated one). Add this page's URL
+     to its OAuth callback URLs.
+  2. Either hardcode DEFAULT_CONSUMER_KEY below and commit it, or leave it blank and
+     paste the key into the UI field once per browser (stored in localStorage only).
+  3. Add this page's origin to Setup -> CORS in every org you plan to connect to.
+*/
+const DEFAULT_CONSUMER_KEY = '3MVG9GCMQoQ6rpzTViwky6e4Z5H5nh_DA.l0ehIFzS0Ocakc_DGmq9dOc35ob2ADS0FcSxpLDwobPftNSB_Yz';
+const API_VERSION = 'v62.0';
+const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+let env = 'sandbox';
+let session = { accessToken: null, instanceUrl: null };
+let allObjects = [];
+let scope = 'custom';
+let subsetSelection = new Set();
+let normalized = { objects: [], relationships: [] };
+let activeTab = 'dict';
+
+// ---------- OAuth (User-Agent / implicit flow) ----------
+function getConsumerKey() {
+  return DEFAULT_CONSUMER_KEY || localStorage.getItem('schema_atlas_key') || '';
+}
+
+function startLogin() {
+  const key = getConsumerKey();
+  if (!key) { alert('Paste and save the connected app consumer key first.'); return; }
+  const host = env === 'sandbox' ? 'https://test.salesforce.com' : 'https://login.salesforce.com';
+  const url = host + '/services/oauth2/authorize'
+    + '?response_type=token'
+    + '&client_id=' + encodeURIComponent(key)
+    + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
+    + '&scope=' + encodeURIComponent('api');
+  window.location.href = url;
+}
+
+function parseAuthResponse() {
+  if (!window.location.hash.includes('access_token')) return false;
+  const params = new URLSearchParams(window.location.hash.substring(1));
+  session.accessToken = params.get('access_token');
+  session.instanceUrl = params.get('instance_url');
+  history.replaceState(null, '', window.location.pathname);
+  return true;
+}
+
+function friendlyOrgLabel(instanceUrl) {
+  try {
+    const host = new URL(instanceUrl).hostname;
+    const base = host.split('.')[0];
+    if (base.includes('--')) {
+      const parts = base.split('--');
+      return parts[0] + ' (' + parts[1] + ')';
+    }
+    return base;
+  } catch (e) { return instanceUrl; }
+}
+
+// ---------- Salesforce REST helpers ----------
+async function sfFetch(path, options) {
+  options = options || {};
+  const res = await fetch(session.instanceUrl + path, {
+    method: options.method || 'GET',
+    body: options.body,
+    headers: Object.assign({ 'Authorization': 'Bearer ' + session.accessToken, 'Content-Type': 'application/json' }, options.headers || {})
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error('Salesforce API error ' + res.status + ': ' + body.slice(0, 200));
+  }
+  return res.json();
+}
+
+async function loadGlobalDescribe() {
+  const data = await sfFetch('/services/data/' + API_VERSION + '/sobjects/');
+  allObjects = data.sobjects.map(function (o) {
+    return { apiName: o.name, label: o.label, custom: o.custom };
+  }).sort(function (a, b) { return a.apiName.localeCompare(b.apiName); });
+}
+
+function objectsInScope() {
+  if (scope === 'all') return allObjects.map(function (o) { return o.apiName; });
+  if (scope === 'custom') return allObjects.filter(function (o) { return o.custom; }).map(function (o) { return o.apiName; });
+  return Array.from(subsetSelection);
+}
+
+async function describeBatch(apiNames, onProgress) {
+  const chunks = [];
+  for (let i = 0; i < apiNames.length; i += 25) chunks.push(apiNames.slice(i, i + 25));
+  const results = {};
+  let nextChunk = 0;
+  let done = 0;
+
+  async function worker() {
+    while (nextChunk < chunks.length) {
+      const chunk = chunks[nextChunk++];
+      const body = JSON.stringify({
+        batchRequests: chunk.map(function (name) {
+          return { method: 'GET', url: API_VERSION + '/sobjects/' + name + '/describe' };
+        })
+      });
+      const resp = await sfFetch('/services/data/' + API_VERSION + '/composite/batch', { method: 'POST', body: body });
+      resp.results.forEach(function (r, i) {
+        if (r.statusCode === 200) results[chunk[i]] = r.result;
+      });
+      done += chunk.length;
+      if (onProgress) onProgress(Math.min(done, apiNames.length), apiNames.length);
+    }
+  }
+
+  const workerCount = Math.min(5, chunks.length || 1);
+  await Promise.all(Array.from({ length: workerCount }, worker));
+  return results;
+}
+
+// ---------- Normalization ----------
+function deriveRelationshipType(field) {
+  if (field.type !== 'reference') return null;
+  return field.cascadeDelete ? 'MasterDetail' : 'Lookup';
+}
+
+function normalize(describeMap) {
+  const objects = [];
+  const relationships = [];
+  const inScope = new Set(Object.keys(describeMap));
+
+  Object.keys(describeMap).forEach(function (apiName) {
+    const d = describeMap[apiName];
+    const fields = d.fields.map(function (f) {
+      return {
+        apiName: f.name,
+        label: f.label,
+        dataType: f.type,
+        length: f.length || null,
+        precision: f.precision || null,
+        scale: f.scale || null,
+        required: f.nillable === false,
+        custom: f.custom,
+        referenceTo: f.referenceTo || [],
+        relationshipName: f.relationshipName || null,
+        relationshipType: deriveRelationshipType(f)
+      };
+    });
+    objects.push({ apiName: d.name, label: d.label, custom: d.custom, keyPrefix: d.keyPrefix, fields: fields });
+
+    fields.filter(function (f) { return f.relationshipType; }).forEach(function (f) {
+      f.referenceTo.forEach(function (target) {
+        relationships.push({
+          sourceObject: apiName,
+          relationshipField: f.apiName,
+          targetObject: target,
+          relationshipType: f.relationshipType,
+          relationshipName: f.relationshipName,
+          targetInScope: inScope.has(target)
+        });
+      });
+    });
+  });
+
+  const byObject = {};
+  relationships.forEach(function (r) {
+    byObject[r.sourceObject] = byObject[r.sourceObject] || [];
+    byObject[r.sourceObject].push(r);
+  });
+  objects.forEach(function (o) {
+    const rels = byObject[o.apiName] || [];
+    const parents = new Set(rels.filter(function (r) { return r.relationshipType === 'MasterDetail'; }).map(function (r) { return r.targetObject; }));
+    o.isJunctionCandidate = parents.size >= 2;
+  });
+
+  return { objects: objects, relationships: relationships };
+}
+
+// ---------- Rendering ----------
+function renderConnStatus() {
+  const dot = document.getElementById('conn-dot');
+  const label = document.getElementById('conn-label');
+  if (session.accessToken) {
+    dot.classList.add('live');
+    label.textContent = 'Connected to ' + friendlyOrgLabel(session.instanceUrl);
+  } else {
+    dot.classList.remove('live');
+    label.textContent = 'Not connected';
+  }
+}
+
+function renderScopeCard() {
+  document.getElementById('scope-card').style.display = 'block';
+  document.getElementById('object-count-sub').textContent = allObjects.length + ' objects visible to this user';
+  renderSubsetList();
+}
+
+function renderSubsetList(filter) {
+  const list = document.getElementById('subset-list');
+  const term = (filter || '').toLowerCase();
+  const visible = allObjects.filter(function (o) {
+    return !term || o.apiName.toLowerCase().includes(term) || o.label.toLowerCase().includes(term);
+  });
+  list.innerHTML = visible.map(function (o) {
+    const checked = subsetSelection.has(o.apiName) ? 'checked' : '';
+    return '<label class="subset-row"><input type="checkbox" data-api="' + o.apiName + '" ' + checked + '>'
+      + '<code>' + o.apiName + '</code><span class="lbl">' + o.label + '</span></label>';
+  }).join('') || '<div class="empty">No objects match that search</div>';
+  list.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      if (cb.checked) subsetSelection.add(cb.dataset.api);
+      else subsetSelection.delete(cb.dataset.api);
+    });
+  });
+}
+
+function renderStats() {
+  const strip = document.getElementById('stats-strip');
+  strip.classList.add('show');
+  document.getElementById('stat-objects').textContent = normalized.objects.length;
+  document.getElementById('stat-fields').textContent = normalized.objects.reduce(function (s, o) { return s + o.fields.length; }, 0);
+  document.getElementById('stat-rel').textContent = normalized.relationships.length;
+  document.getElementById('stat-junction').textContent = normalized.objects.filter(function (o) { return o.isJunctionCandidate; }).length;
+}
+
+function relBadge(type) {
+  if (type === 'MasterDetail') return '<span class="badge md">Master-detail</span>';
+  if (type === 'Lookup') return '<span class="badge lookup">Lookup</span>';
+  return '';
+}
+
+function renderDictTable(filter) {
+  const term = (filter || '').toLowerCase();
+  const rows = [];
+  normalized.objects.forEach(function (o) {
+    o.fields.forEach(function (f) {
+      const hay = (o.apiName + ' ' + f.apiName + ' ' + f.dataType).toLowerCase();
+      if (term && !hay.includes(term)) return;
+      rows.push('<tr><td class="mono">' + o.apiName + (o.isJunctionCandidate ? ' <span class="badge junction">junction?</span>' : '') + '</td>'
+        + '<td class="mono">' + f.apiName + '</td><td>' + f.label + '</td><td>' + f.dataType + '</td>'
+        + '<td>' + (f.length || (f.precision ? f.precision + ',' + f.scale : '')) + '</td>'
+        + '<td>' + (f.required ? 'Yes' : 'No') + '</td><td>' + relBadge(f.relationshipType) + '</td></tr>');
+    });
+  });
+  document.getElementById('dict-wrap').innerHTML = '<table><thead><tr><th class="mono">Object</th><th class="mono">Field</th>'
+    + '<th>Label</th><th>Type</th><th>Length</th><th>Required</th><th>Relationship</th></tr></thead><tbody>'
+    + (rows.join('') || '<tr><td colspan="7" class="empty">No fields match that search</td></tr>') + '</tbody></table>';
+}
+
+function renderMatrixTable(filter) {
+  const term = (filter || '').toLowerCase();
+  const rows = normalized.relationships.filter(function (r) {
+    return !term || (r.sourceObject + ' ' + r.targetObject + ' ' + r.relationshipField).toLowerCase().includes(term);
+  }).map(function (r) {
+    return '<tr><td class="mono">' + r.sourceObject + '</td><td class="mono">' + r.relationshipField + '</td>'
+      + '<td class="mono">' + r.targetObject + (r.targetInScope ? '' : ' <span class="lbl" style="color:var(--text-faint)">(outside selection)</span>') + '</td>'
+      + '<td>' + relBadge(r.relationshipType) + '</td><td class="mono">' + (r.relationshipName || '') + '</td></tr>';
+  });
+  document.getElementById('matrix-wrap').innerHTML = '<table><thead><tr><th class="mono">Source object</th><th class="mono">Field</th>'
+    + '<th class="mono">Target object</th><th>Type</th><th class="mono">Child relationship</th></tr></thead><tbody>'
+    + (rows.join('') || '<tr><td colspan="5" class="empty">No relationships match that search</td></tr>') + '</tbody></table>';
+}
+
+// ---------- Export ----------
+async function exportExcel() {
+  const wb = new ExcelJS.Workbook();
+  const dict = wb.addWorksheet('Data dictionary');
+  dict.columns = [
+    { header: 'Object API name', key: 'obj', width: 28 },
+    { header: 'Object label', key: 'objLabel', width: 24 },
+    { header: 'Field API name', key: 'field', width: 30 },
+    { header: 'Field label', key: 'fieldLabel', width: 24 },
+    { header: 'Data type', key: 'type', width: 14 },
+    { header: 'Length / precision', key: 'len', width: 16 },
+    { header: 'Required', key: 'req', width: 10 },
+    { header: 'Relationship type', key: 'relType', width: 16 }
+  ];
+  normalized.objects.forEach(function (o) {
+    o.fields.forEach(function (f) {
+      dict.addRow({
+        obj: o.apiName, objLabel: o.label, field: f.apiName, fieldLabel: f.label, type: f.dataType,
+        len: f.length || (f.precision ? f.precision + ',' + f.scale : ''),
+        req: f.required ? 'Yes' : 'No', relType: f.relationshipType || ''
+      });
+    });
+  });
+  styleHeader(dict);
+
+  const matrix = wb.addWorksheet('Relationship matrix');
+  matrix.columns = [
+    { header: 'Source object', key: 'src', width: 26 },
+    { header: 'Relationship field', key: 'field', width: 28 },
+    { header: 'Target object', key: 'tgt', width: 26 },
+    { header: 'Relationship type', key: 'type', width: 16 },
+    { header: 'Child relationship name', key: 'rel', width: 26 },
+    { header: 'Target in selection', key: 'inScope', width: 18 }
+  ];
+  normalized.relationships.forEach(function (r) {
+    const row = matrix.addRow({
+      src: r.sourceObject, field: r.relationshipField, tgt: r.targetObject,
+      type: r.relationshipType, rel: r.relationshipName || '', inScope: r.targetInScope ? 'Yes' : 'No'
+    });
+    row.getCell('type').fill = {
+      type: 'pattern', pattern: 'solid',
+      fgColor: { argb: r.relationshipType === 'MasterDetail' ? 'FFE3F3EA' : 'FFEAF0FB' }
+    };
+  });
+  styleHeader(matrix);
+
+  const buf = await wb.xlsx.writeBuffer();
+  downloadBlob(buf, 'schema-export.xlsx', 'application/octet-stream');
+}
+
+function styleHeader(ws) {
+  const row = ws.getRow(1);
+  row.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+  row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2F5FB3' } };
+  ws.views = [{ state: 'frozen', ySplit: 1 }];
+  ws.autoFilter = { from: 'A1', to: { row: 1, column: ws.columns.length } };
+}
+
+function csvEscape(v) {
+  const s = String(v == null ? '' : v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function exportLucidCsv() {
+  const rows = [['dbms', 'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME', 'COLUMN_NAME', 'ORDINAL_POSITION', 'DATA_TYPE',
+    'CHARACTER_MAXIMUM_LENGTH', 'CONSTRAINT_TYPE', 'TABLE_SCHEMA', 'TABLE_NAME', 'COLUMN_NAME']];
+  const customByName = {};
+  allObjects.forEach(function (o) { customByName[o.apiName] = o.custom; });
+
+  normalized.objects.forEach(function (o) {
+    const schema = o.custom ? 'Custom' : 'Standard';
+    o.fields.forEach(function (f, idx) {
+      const pos = idx + 1;
+      if (f.apiName === 'Id') {
+        rows.push(['postgresql', 'SalesforceOrg', schema, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'PRIMARY KEY', '', '', '']);
+      } else if (f.relationshipType && f.referenceTo.length) {
+        f.referenceTo.forEach(function (target) {
+          const targetSchema = customByName[target] ? 'Custom' : 'Standard';
+          rows.push(['postgresql', 'SalesforceOrg', schema, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'FOREIGN KEY', targetSchema, target, 'Id']);
+        });
+      } else {
+        rows.push(['postgresql', 'SalesforceOrg', schema, o.apiName, f.apiName, pos, f.dataType, f.length || '', '', '', '', '']);
+      }
+    });
+  });
+
+  const csv = rows.map(function (r) { return r.map(csvEscape).join(','); }).join('\n');
+  downloadBlob(csv, 'schema-erd-import.csv', 'text/csv');
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ---------- Wiring ----------
+document.getElementById('env-sandbox').addEventListener('click', function () { setEnv('sandbox'); });
+document.getElementById('env-prod').addEventListener('click', function () { setEnv('prod'); });
+function setEnv(e) {
+  env = e;
+  document.getElementById('env-sandbox').classList.toggle('active', e === 'sandbox');
+  document.getElementById('env-prod').classList.toggle('active', e === 'prod');
+}
+
+document.getElementById('save-key-btn').addEventListener('click', function () {
+  const v = document.getElementById('consumer-key-input').value.trim();
+  if (v) { localStorage.setItem('schema_atlas_key', v); document.getElementById('key-card').style.display = 'none'; }
+});
+
+document.getElementById('connect-btn').addEventListener('click', startLogin);
+
+document.querySelectorAll('.scope-card').forEach(function (card) {
+  card.addEventListener('click', function () {
+    document.querySelectorAll('.scope-card').forEach(function (c) { c.classList.remove('selected'); });
+    card.classList.add('selected');
+    scope = card.dataset.scope;
+    document.getElementById('subset-panel').classList.toggle('open', scope === 'subset');
+  });
+});
+
+document.getElementById('subset-search').addEventListener('input', function (e) { renderSubsetList(e.target.value); });
+document.getElementById('subset-select-all').addEventListener('click', function () {
+  document.querySelectorAll('#subset-list input[type=checkbox]').forEach(function (cb) { cb.checked = true; subsetSelection.add(cb.dataset.api); });
+});
+document.getElementById('subset-clear').addEventListener('click', function () {
+  subsetSelection.clear();
+  renderSubsetList(document.getElementById('subset-search').value);
+});
+
+document.getElementById('extract-btn').addEventListener('click', async function () {
+  const targets = objectsInScope();
+  if (!targets.length) { alert('Choose at least one object first.'); return; }
+  if (scope === 'all' && targets.length > 300) {
+    if (!confirm('That is ' + targets.length + ' objects. Large extractions take longer and use more API calls. Continue?')) return;
+  }
+  const btn = document.getElementById('extract-btn');
+  btn.disabled = true;
+  const progress = document.getElementById('progress-label');
+  try {
+    const describeMap = await describeBatch(targets, function (done, total) {
+      progress.textContent = 'Describing ' + done + ' of ' + total + ' objects...';
+    });
+    normalized = normalize(describeMap);
+    progress.textContent = 'Done. ' + Object.keys(describeMap).length + ' of ' + targets.length + ' objects described.';
+    document.getElementById('preview-card').style.display = 'block';
+    renderStats();
+    renderDictTable();
+    renderMatrixTable();
+  } catch (err) {
+    progress.textContent = 'Error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.querySelectorAll('.tab').forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    document.getElementById('dict-wrap').style.display = activeTab === 'dict' ? 'block' : 'none';
+    document.getElementById('matrix-wrap').style.display = activeTab === 'matrix' ? 'block' : 'none';
+  });
+});
+
+document.getElementById('dict-search').addEventListener('input', function (e) {
+  if (activeTab === 'dict') renderDictTable(e.target.value);
+  else renderMatrixTable(e.target.value);
+});
+
+document.getElementById('export-excel-btn').addEventListener('click', exportExcel);
+document.getElementById('export-lucid-btn').addEventListener('click', exportLucidCsv);
+
+// ---------- Boot ----------
+(async function init() {
+  if (getConsumerKey()) document.getElementById('key-card').style.display = 'none';
+  if (parseAuthResponse()) {
+    renderConnStatus();
+    try {
+      await loadGlobalDescribe();
+      renderScopeCard();
+    } catch (err) {
+      alert('Connected, but could not load the object list: ' + err.message);
+    }
+  } else {
+    renderConnStatus();
+  }
+})();
+</script>
+</body>
+</html>
