@@ -3,184 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Schema Atlas</title>
+<title>Schema Atlas — Salesforce schema extraction &amp; export</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #ffffff;
-    --bg-soft: #f6f7f9;
-    --bg-strip: #11192e;
-    --border: #e2e4e9;
-    --text: #1c1f26;
-    --text-soft: #5b6270;
-    --text-faint: #8a8f9b;
-    --accent: #2f5fb3;
-    --accent-soft: #eaf0fb;
-    --accent-text: #1e3f7d;
-    --md: #1d7a4c;
-    --md-soft: #e3f3ea;
-    --lookup: #2f5fb3;
-    --lookup-soft: #eaf0fb;
-    --warn: #9a5b12;
-    --warn-soft: #fbf0e1;
-    --mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
-    --radius: 8px;
+  :root{
+    --bg:#0b1018; --panel:#121a28; --panel-2:#172132; --raised:#1d293d;
+    --line:#27344c; --line-soft:#1f2b40;
+    --text:#e8eef9; --muted:#8595b3; --faint:#5d6c8a;
+    --ok:#34d399; --warn:#f5b53d; --miss:#7aa2ff; --risk:#ff4d6d;
+    --accent:#5b8cff;
+    --r:10px; --r-lg:16px;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,-apple-system,sans-serif;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    color: var(--text);
-    background: var(--bg-soft);
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(91,140,255,.10), transparent 60%),
+      radial-gradient(700px 400px at -5% 110%, rgba(45,212,191,.07), transparent 55%),
+      var(--bg);
+    color:var(--text); font-family:var(--body); line-height:1.5;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
   }
-  header {
-    position: sticky; top: 0; z-index: 20;
-    background: var(--bg); border-bottom: 1px solid var(--border);
-    padding: 14px 24px;
-    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 22px 80px}
+  a{color:var(--accent)}
+  button{font-family:inherit}
+  ::selection{background:rgba(91,140,255,.35)}
+
+  .top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border-radius:var(--r-lg);padding:18px 22px;margin-bottom:18px}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .brand h1{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0;
+    display:flex;align-items:center;gap:10px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--faint)}
+  .brand .dot.live{background:var(--ok);box-shadow:0 0 12px var(--ok)}
+  .brand p{margin:0;color:var(--muted);font-size:13px}
+  .top .spacer{flex:1}
+
+  .modebtn{background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 13px;font-family:var(--body);font-size:12.5px;cursor:pointer;transition:.15s}
+  .modebtn:hover{border-color:var(--accent);color:var(--text)}
+  .modebtn.active{background:var(--accent);border-color:var(--accent);color:#08111f;font-weight:600}
+  .env-toggle{display:flex;gap:6px}
+
+  .btn{font-family:var(--disp);font-weight:600;font-size:13.5px;border-radius:9px;padding:10px 18px;cursor:pointer;
+    border:1px solid var(--line);background:var(--raised);color:var(--text);transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.primary{background:linear-gradient(180deg,#6f9bff,#4d7df0);border-color:#5b8cff;color:#0b1018;
+    box-shadow:0 4px 16px rgba(91,140,255,.3)}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn.ghost{background:transparent}
+
+  .connstat{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;font-family:var(--mono)}
+
+  .panel{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel);padding:20px 22px;margin-bottom:18px}
+  .panel h2{font-family:var(--disp);font-size:15px;font-weight:600;margin:0 0 4px}
+  .panel .sub{font-size:12px;color:var(--muted);margin:0 0 16px}
+
+  .scope-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  #scopeHint{font-size:11.5px;color:var(--faint);margin-left:6px}
+
+  .subset-panel{margin-top:14px;display:none}
+  .subset-panel.open{display:block}
+  .subset-actions{display:flex;gap:14px;margin-bottom:8px}
+  .subset-actions a{font-size:12px;color:var(--accent);cursor:pointer}
+  .controls input[type=search]{background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;width:100%}
+  .controls input[type=search]:focus{border-color:var(--accent)}
+  #subsetList{max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);margin-top:8px;background:var(--panel-2)}
+  .subset-row{display:flex;align-items:center;gap:9px;padding:7px 10px;font-family:var(--mono);font-size:12px;
+    border-bottom:1px solid var(--line-soft);cursor:pointer}
+  .subset-row:last-child{border-bottom:0}
+  .subset-row input{accent-color:var(--accent);width:14px;height:14px;flex:0 0 auto}
+  .subset-row .lbl{color:var(--muted);font-family:var(--body)}
+  .empty{color:var(--faint);font-size:13px;padding:24px;text-align:center}
+
+  #progressLabel{font-size:12px;color:var(--accent);font-family:var(--mono);min-height:16px;margin-top:10px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;display:none}
+  .cards.show{display:grid}
+  .card{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:14px 16px}
+  .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .card .v{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:-.02em;margin-top:4px}
+
+  .lenses{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .lens{font-family:var(--disp);font-weight:600;font-size:13px;color:var(--muted);background:none;border:0;
+    padding:9px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+  .lens:hover{color:var(--text)}
+  .lens.active{color:var(--text);border-bottom-color:var(--accent)}
+
+  .tablewrap{max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:var(--r)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead th{text-align:left;font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);
+    background:var(--panel-2);position:sticky;top:0}
+  td.mono,th.mono{font-family:var(--mono)}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  tbody tr:hover{background:var(--panel-2)}
+  tbody tr:last-child td{border-bottom:0}
+
+  .badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10.5px;font-weight:600;font-family:var(--body)}
+  .badge.md{background:rgba(52,211,153,.15);color:var(--ok)}
+  .badge.lookup{background:rgba(122,162,255,.15);color:var(--miss)}
+  .badge.junction{background:rgba(245,181,61,.15);color:var(--warn)}
+
+  .export-row{display:flex;gap:10px;margin-top:16px;align-items:center}
+  .export-row .note{font-size:11.5px;color:var(--faint)}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--raised);border:1px solid var(--accent);color:var(--text);padding:11px 20px;border-radius:10px;
+    font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.4);transition:transform .3s;z-index:70;max-width:480px}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:880px){
+    .cards{grid-template-columns:1fr 1fr}
+    .top{flex-direction:column;align-items:stretch}
   }
-  header h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
-  header h1 span { color: var(--text-faint); font-weight: 400; font-size: 13px; margin-left: 8px; }
-  .env-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .env-toggle button {
-    border: none; background: var(--bg); padding: 7px 14px; font-size: 13px; cursor: pointer; color: var(--text-soft);
-  }
-  .env-toggle button.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
-  .btn {
-    border: 1px solid var(--accent); background: var(--accent); color: #fff;
-    padding: 8px 16px; border-radius: var(--radius); font-size: 13px; cursor: pointer; font-weight: 500;
-  }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn.secondary { background: var(--bg); color: var(--accent-text); border-color: var(--border); }
-  .conn-status { margin-left: auto; font-size: 13px; color: var(--text-soft); display: flex; align-items: center; gap: 8px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); }
-  .dot.live { background: var(--md); }
-  main { max-width: 1080px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-  .card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
-  .card h2 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
-  .card .sub { font-size: 12px; color: var(--text-soft); margin: 0 0 16px; }
-  .key-field { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
-  .key-field input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--mono); font-size: 12px; }
-  .scope-options { display: flex; gap: 10px; flex-wrap: wrap; }
-  .scope-card {
-    flex: 1; min-width: 160px; border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 12px 14px; cursor: pointer; font-size: 13px;
-  }
-  .scope-card.selected { border-color: var(--accent); background: var(--accent-soft); }
-  .scope-card strong { display: block; margin-bottom: 2px; }
-  .scope-card span { color: var(--text-soft); font-size: 12px; }
-  #subset-panel { margin-top: 14px; display: none; }
-  #subset-panel.open { display: block; }
-  #subset-search { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; margin-bottom: 8px; }
-  #subset-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); }
-  .subset-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: 13px; border-bottom: 1px solid var(--border); }
-  .subset-row:last-child { border-bottom: none; }
-  .subset-row code { font-family: var(--mono); font-size: 12px; }
-  .subset-row .lbl { color: var(--text-soft); font-size: 12px; }
-  .subset-actions { display: flex; gap: 8px; margin-bottom: 8px; }
-  .subset-actions a { font-size: 12px; color: var(--accent); cursor: pointer; }
-  .stats-strip {
-    position: sticky; top: 57px; z-index: 15; background: var(--bg-strip); color: #fff;
-    border-radius: 10px; padding: 12px 20px; display: none; gap: 28px;
-  }
-  .stats-strip.show { display: flex; }
-  .stat b { font-size: 16px; display: block; }
-  .stat span { font-size: 11px; color: #aab3c8; text-transform: uppercase; letter-spacing: 0.04em; }
-  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
-  .tab { padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--text-soft); border-bottom: 2px solid transparent; }
-  .tab.active { color: var(--accent-text); border-bottom-color: var(--accent); font-weight: 600; }
-  .table-search { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; margin-bottom: 10px; }
-  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  th { text-align: left; padding: 8px 10px; background: var(--bg-soft); color: var(--text-soft); font-weight: 600; position: sticky; top: 0; }
-  td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
-  td.mono, th.mono { font-family: var(--mono); }
-  .table-wrap { max-height: 420px; overflow: auto; border: 1px solid var(--border); border-radius: var(--radius); }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
-  .badge.md { background: var(--md-soft); color: var(--md); }
-  .badge.lookup { background: var(--lookup-soft); color: var(--lookup); }
-  .badge.junction { background: var(--warn-soft); color: var(--warn); }
-  .export-row { display: flex; gap: 10px; margin-top: 16px; }
-  .empty { color: var(--text-faint); font-size: 13px; padding: 30px; text-align: center; }
-  .progress { font-size: 12px; color: var(--text-soft); margin-top: 8px; }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<header>
-  <h1>Schema Atlas <span>org schema extraction &amp; export</span></h1>
-  <div class="env-toggle">
-    <button id="env-sandbox" class="active">Sandbox</button>
-    <button id="env-prod">Production</button>
-  </div>
-  <button class="btn" id="connect-btn">Connect to Salesforce</button>
-  <div class="conn-status"><span class="dot" id="conn-dot"></span><span id="conn-label">Not connected</span></div>
-</header>
-
-<main>
-
-  <div class="card" id="key-card">
-    <h2>Connected app key</h2>
-    <p class="sub">Reuses the same connected app as your other tools. Paste the consumer key once — it's saved only in this browser, never committed.</p>
-    <div class="key-field">
-      <input type="text" id="consumer-key-input" placeholder="Connected app consumer key">
-      <button class="btn secondary" id="save-key-btn">Save</button>
+  <div class="top">
+    <div class="brand">
+      <h1><span class="dot" id="connDot"></span>Schema Atlas</h1>
+      <p>Extract a Salesforce org's objects, fields, and relationships — preview, then export to Excel or Lucidchart.</p>
     </div>
+    <div class="spacer"></div>
+    <div class="env-toggle">
+      <button class="modebtn active" id="envSandbox">Sandbox</button>
+      <button class="modebtn" id="envProd">Production</button>
+    </div>
+    <button class="btn primary" id="connectBtn">Connect to Salesforce</button>
+    <div class="connstat" id="connLabel">Not connected</div>
   </div>
 
-  <div class="card" id="scope-card" style="display:none">
+  <div class="panel" id="scopeCard" style="display:none">
     <h2>1. Choose what to extract</h2>
-    <p class="sub" id="object-count-sub"></p>
-    <div class="scope-options">
-      <div class="scope-card" data-scope="all"><strong>Entire schema</strong><span>Every object you can see</span></div>
-      <div class="scope-card selected" data-scope="custom"><strong>Custom objects only</strong><span>Anything ending in __c</span></div>
-      <div class="scope-card" data-scope="subset"><strong>Specific subset</strong><span>Pick objects by name</span></div>
+    <p class="sub" id="objectCountSub"></p>
+    <div class="scope-row">
+      <button class="modebtn active" data-scope="custom">Custom objects only</button>
+      <button class="modebtn" data-scope="all">Entire schema</button>
+      <button class="modebtn" data-scope="subset">Specific subset</button>
+      <span id="scopeHint"></span>
     </div>
-    <div id="subset-panel">
-      <div class="subset-actions"><a id="subset-select-all">Select all visible</a><a id="subset-clear">Clear</a></div>
-      <input type="text" id="subset-search" placeholder="Search objects by API name or label">
-      <div id="subset-list"></div>
+    <div class="subset-panel" id="subsetPanel">
+      <div class="subset-actions"><a id="subsetSelectAll">Select all visible</a><a id="subsetClear">Clear</a></div>
+      <div class="controls"><input type="search" id="subsetSearch" placeholder="Search objects by API name or label"></div>
+      <div id="subsetList"></div>
     </div>
-    <button class="btn" id="extract-btn" style="margin-top:16px">Extract schema</button>
-    <div class="progress" id="progress-label"></div>
+    <div style="margin-top:16px"><button class="btn primary" id="extractBtn">Extract schema</button></div>
+    <div id="progressLabel"></div>
   </div>
 
-  <div class="stats-strip" id="stats-strip">
-    <div class="stat"><b id="stat-objects">0</b><span>Objects</span></div>
-    <div class="stat"><b id="stat-fields">0</b><span>Fields</span></div>
-    <div class="stat"><b id="stat-rel">0</b><span>Relationships</span></div>
-    <div class="stat"><b id="stat-junction">0</b><span>Likely junctions</span></div>
+  <div class="cards" id="statsCards">
+    <div class="card"><div class="k">Objects</div><div class="v" id="statObjects">0</div></div>
+    <div class="card"><div class="k">Fields</div><div class="v" id="statFields">0</div></div>
+    <div class="card"><div class="k">Relationships</div><div class="v" id="statRel">0</div></div>
+    <div class="card"><div class="k">Likely junctions</div><div class="v" id="statJunction">0</div></div>
   </div>
 
-  <div class="card" id="preview-card" style="display:none">
-    <div class="tabs">
-      <div class="tab active" data-tab="dict">Data dictionary</div>
-      <div class="tab" data-tab="matrix">Relationship matrix</div>
+  <div class="panel" id="previewCard" style="display:none">
+    <div class="lenses">
+      <button class="lens active" data-tab="dict">Data dictionary</button>
+      <button class="lens" data-tab="matrix">Relationship matrix</button>
     </div>
-    <input type="text" class="table-search" id="dict-search" placeholder="Filter by object, field, or type">
-    <div class="table-wrap" id="dict-wrap"></div>
-    <div class="table-wrap" id="matrix-wrap" style="display:none"></div>
+    <div class="controls" style="margin-bottom:10px"><input type="search" id="tableSearch" placeholder="Filter by object, field, or type"></div>
+    <div class="tablewrap" id="dictWrap"></div>
+    <div class="tablewrap" id="matrixWrap" style="display:none"></div>
     <div class="export-row">
-      <button class="btn" id="export-excel-btn">Download Excel workbook</button>
-      <button class="btn secondary" id="export-lucid-btn">Download Lucidchart CSV</button>
+      <button class="btn primary" id="exportExcelBtn">Download Excel workbook</button>
+      <button class="btn ghost" id="exportLucidBtn">Download Lucidchart CSV</button>
+      <span class="note">Both exports run entirely in your browser — nothing is uploaded anywhere.</span>
     </div>
   </div>
 
-</main>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
 /*
   Setup checklist (same pattern as the other tools in the toolkit):
-  1. Reuse the existing connected app (or create a dedicated one). Add this page's URL
-     to its OAuth callback URLs.
-  2. Either hardcode DEFAULT_CONSUMER_KEY below and commit it, or leave it blank and
-     paste the key into the UI field once per browser (stored in localStorage only).
+  1. This page's eventual URL must be added to the shared connected app's OAuth callback URLs.
+  2. The consumer key below is the same public client_id the other tools use — safe to commit,
+     it is not the consumer secret.
   3. Add this page's origin to Setup -> CORS in every org you plan to connect to.
 */
-const DEFAULT_CONSUMER_KEY = '3MVG9GCMQoQ6rpzTViwky6e4Z5H5nh_DA.l0ehIFzS0Ocakc_DGmq9dOc35ob2ADS0FcSxpLDwobPftNSB_Yz';
-const API_VERSION = 'v62.0';
-const REDIRECT_URI = window.location.origin + window.location.pathname;
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let toastT;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3200); }
 
-let env = 'sandbox';
+const API_VERSION = 'v62.0';
+const DEFAULT_CONSUMER_KEY = '3MVG9GCMQoQ6rpzTViwky6e4Z5H5nh_DA.l0ehIFzS0Ocakc_DGmq9dOc35ob2ADS0FcSxpLDwobPftNSB_Yz';
+const LS_KEY = 'schema_atlas_key';
+function getKey(){ try{ return DEFAULT_CONSUMER_KEY || localStorage.getItem(LS_KEY) || ''; }catch(e){ return DEFAULT_CONSUMER_KEY || ''; } }
+
+let envType = 'sandbox';
 let session = { accessToken: null, instanceUrl: null };
 let allObjects = [];
 let scope = 'custom';
@@ -188,45 +216,76 @@ let subsetSelection = new Set();
 let normalized = { objects: [], relationships: [] };
 let activeTab = 'dict';
 
-// ---------- OAuth (User-Agent / implicit flow) ----------
-function getConsumerKey() {
-  return DEFAULT_CONSUMER_KEY || localStorage.getItem('schema_atlas_key') || '';
+function fetchOrgName(inst){
+  try{
+    const sub = new URL(inst).host.split('.')[0];
+    if (sub.includes('--')) { const parts = sub.split('--'); return parts[0] + ' (' + parts[1] + ')'; }
+    return sub + ' (prod)';
+  } catch (e) { return ''; }
 }
 
-function startLogin() {
-  const key = getConsumerKey();
-  if (!key) { alert('Paste and save the connected app consumer key first.'); return; }
-  const host = env === 'sandbox' ? 'https://test.salesforce.com' : 'https://login.salesforce.com';
-  const url = host + '/services/oauth2/authorize'
+/* ---------- OAuth (User-Agent / implicit) via popup ---------- */
+let pendingConnect = null;
+function oauthLogin(){
+  const key = getKey();
+  if (!key) { toast('No consumer key configured.'); return; }
+  const loginUrl = envType === 'sandbox' ? 'https://test.salesforce.com' : 'https://login.salesforce.com';
+  const redirect = location.origin + location.pathname;
+  pendingConnect = { env: envType };
+  const url = loginUrl + '/services/oauth2/authorize'
     + '?response_type=token'
     + '&client_id=' + encodeURIComponent(key)
-    + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
-    + '&scope=' + encodeURIComponent('api');
-  window.location.href = url;
+    + '&redirect_uri=' + encodeURIComponent(redirect)
+    + '&scope=' + encodeURIComponent('full')
+    + '&state=' + encodeURIComponent(envType)
+    + '&prompt=login';
+  const w = window.open(url, 'sf_login', 'width=620,height=780');
+  if (!w) { toast('Your browser blocked the popup. Allow popups for this site, then click Connect again.'); pendingConnect = null; }
 }
-
-function parseAuthResponse() {
-  if (!window.location.hash.includes('access_token')) return false;
-  const params = new URLSearchParams(window.location.hash.substring(1));
-  session.accessToken = params.get('access_token');
-  session.instanceUrl = params.get('instance_url');
-  history.replaceState(null, '', window.location.pathname);
+window.addEventListener('message', function (ev) {
+  if (ev.origin !== location.origin || !ev.data || !ev.data.schemaAtlasToken) return;
+  const p = new URLSearchParams(String(ev.data.schemaAtlasToken).replace(/^#/, ''));
+  pendingConnect = null;
+  if (p.get('error')) { toast('Login failed: ' + (p.get('error_description') || p.get('error'))); return; }
+  finishConnect(p.get('instance_url'), p.get('access_token'));
+});
+function handleOAuthReturn(){
+  const h = location.hash || '';
+  if (h.indexOf('access_token=') === -1 && h.indexOf('error=') === -1) return true;
+  if (window.opener && window.opener !== window) {
+    try { window.opener.postMessage({ schemaAtlasToken: h }, location.origin); } catch (e) {}
+    try { document.body.innerHTML = '<p style="font-family:Inter,system-ui,sans-serif;color:#8595b3;padding:40px;text-align:center">Signed in — you can close this window.</p>'; } catch (e) {}
+    window.close();
+    return false;
+  }
+  history.replaceState(null, '', location.pathname);
+  const p = new URLSearchParams(h.replace(/^#/, ''));
+  if (p.get('error')) { toast('Login failed: ' + (p.get('error_description') || p.get('error'))); return true; }
+  finishConnect(p.get('instance_url'), p.get('access_token'));
   return true;
 }
 
-function friendlyOrgLabel(instanceUrl) {
+async function finishConnect(inst, token){
+  if (!inst || !token) return;
+  session.accessToken = token;
+  session.instanceUrl = inst;
+  const orgLabel = fetchOrgName(inst);
+  $('#connDot').classList.add('live');
+  $('#connLabel').textContent = '\u23F3 loading objects\u2026';
   try {
-    const host = new URL(instanceUrl).hostname;
-    const base = host.split('.')[0];
-    if (base.includes('--')) {
-      const parts = base.split('--');
-      return parts[0] + ' (' + parts[1] + ')';
-    }
-    return base;
-  } catch (e) { return instanceUrl; }
+    await loadGlobalDescribe();
+    $('#connLabel').textContent = 'Connected to ' + orgLabel;
+    renderScopeCard();
+  } catch (err) {
+    const cors = /Failed to fetch|NetworkError|TypeError/.test(String(err));
+    $('#connLabel').textContent = cors ? '\u2717 read blocked \u2014 add CORS' : '\u2717 ' + (err.message || err);
+    toast(cors
+      ? 'Logged in, but blocked by CORS \u2014 add ' + location.origin + ' to the org\u2019s CORS allowlist (Setup \u2192 CORS), then connect again.'
+      : 'Failed: ' + (err.message || err));
+  }
 }
 
-// ---------- Salesforce REST helpers ----------
+/* ---------- Salesforce REST helpers ---------- */
 async function sfFetch(path, options) {
   options = options || {};
   const res = await fetch(session.instanceUrl + path, {
@@ -283,7 +342,7 @@ async function describeBatch(apiNames, onProgress) {
   return results;
 }
 
-// ---------- Normalization ----------
+/* ---------- Normalization ---------- */
 function deriveRelationshipType(field) {
   if (field.type !== 'reference') return null;
   return field.cascadeDelete ? 'MasterDetail' : 'Lookup';
@@ -298,16 +357,10 @@ function normalize(describeMap) {
     const d = describeMap[apiName];
     const fields = d.fields.map(function (f) {
       return {
-        apiName: f.name,
-        label: f.label,
-        dataType: f.type,
-        length: f.length || null,
-        precision: f.precision || null,
-        scale: f.scale || null,
-        required: f.nillable === false,
-        custom: f.custom,
-        referenceTo: f.referenceTo || [],
-        relationshipName: f.relationshipName || null,
+        apiName: f.name, label: f.label, dataType: f.type,
+        length: f.length || null, precision: f.precision || null, scale: f.scale || null,
+        required: f.nillable === false, custom: f.custom,
+        referenceTo: f.referenceTo || [], relationshipName: f.relationshipName || null,
         relationshipType: deriveRelationshipType(f)
       };
     });
@@ -316,11 +369,8 @@ function normalize(describeMap) {
     fields.filter(function (f) { return f.relationshipType; }).forEach(function (f) {
       f.referenceTo.forEach(function (target) {
         relationships.push({
-          sourceObject: apiName,
-          relationshipField: f.apiName,
-          targetObject: target,
-          relationshipType: f.relationshipType,
-          relationshipName: f.relationshipName,
+          sourceObject: apiName, relationshipField: f.apiName, targetObject: target,
+          relationshipType: f.relationshipType, relationshipName: f.relationshipName,
           targetInScope: inScope.has(target)
         });
       });
@@ -341,27 +391,22 @@ function normalize(describeMap) {
   return { objects: objects, relationships: relationships };
 }
 
-// ---------- Rendering ----------
-function renderConnStatus() {
-  const dot = document.getElementById('conn-dot');
-  const label = document.getElementById('conn-label');
-  if (session.accessToken) {
-    dot.classList.add('live');
-    label.textContent = 'Connected to ' + friendlyOrgLabel(session.instanceUrl);
-  } else {
-    dot.classList.remove('live');
-    label.textContent = 'Not connected';
-  }
-}
+/* ---------- Rendering ---------- */
+const SCOPE_HINT = {
+  custom: 'Anything ending in __c.',
+  all: 'Every object you can see. Slower for large orgs.',
+  subset: 'Pick objects by name below.'
+};
 
 function renderScopeCard() {
-  document.getElementById('scope-card').style.display = 'block';
-  document.getElementById('object-count-sub').textContent = allObjects.length + ' objects visible to this user';
+  $('#scopeCard').style.display = 'block';
+  $('#objectCountSub').textContent = allObjects.length + ' objects visible to this user';
+  $('#scopeHint').textContent = SCOPE_HINT[scope];
   renderSubsetList();
 }
 
 function renderSubsetList(filter) {
-  const list = document.getElementById('subset-list');
+  const list = $('#subsetList');
   const term = (filter || '').toLowerCase();
   const visible = allObjects.filter(function (o) {
     return !term || o.apiName.toLowerCase().includes(term) || o.label.toLowerCase().includes(term);
@@ -369,7 +414,7 @@ function renderSubsetList(filter) {
   list.innerHTML = visible.map(function (o) {
     const checked = subsetSelection.has(o.apiName) ? 'checked' : '';
     return '<label class="subset-row"><input type="checkbox" data-api="' + o.apiName + '" ' + checked + '>'
-      + '<code>' + o.apiName + '</code><span class="lbl">' + o.label + '</span></label>';
+      + '<span>' + o.apiName + '</span><span class="lbl">' + esc(o.label) + '</span></label>';
   }).join('') || '<div class="empty">No objects match that search</div>';
   list.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
     cb.addEventListener('change', function () {
@@ -380,12 +425,11 @@ function renderSubsetList(filter) {
 }
 
 function renderStats() {
-  const strip = document.getElementById('stats-strip');
-  strip.classList.add('show');
-  document.getElementById('stat-objects').textContent = normalized.objects.length;
-  document.getElementById('stat-fields').textContent = normalized.objects.reduce(function (s, o) { return s + o.fields.length; }, 0);
-  document.getElementById('stat-rel').textContent = normalized.relationships.length;
-  document.getElementById('stat-junction').textContent = normalized.objects.filter(function (o) { return o.isJunctionCandidate; }).length;
+  $('#statsCards').classList.add('show');
+  $('#statObjects').textContent = normalized.objects.length;
+  $('#statFields').textContent = normalized.objects.reduce(function (s, o) { return s + o.fields.length; }, 0);
+  $('#statRel').textContent = normalized.relationships.length;
+  $('#statJunction').textContent = normalized.objects.filter(function (o) { return o.isJunctionCandidate; }).length;
 }
 
 function relBadge(type) {
@@ -402,12 +446,12 @@ function renderDictTable(filter) {
       const hay = (o.apiName + ' ' + f.apiName + ' ' + f.dataType).toLowerCase();
       if (term && !hay.includes(term)) return;
       rows.push('<tr><td class="mono">' + o.apiName + (o.isJunctionCandidate ? ' <span class="badge junction">junction?</span>' : '') + '</td>'
-        + '<td class="mono">' + f.apiName + '</td><td>' + f.label + '</td><td>' + f.dataType + '</td>'
+        + '<td class="mono">' + f.apiName + '</td><td>' + esc(f.label) + '</td><td>' + f.dataType + '</td>'
         + '<td>' + (f.length || (f.precision ? f.precision + ',' + f.scale : '')) + '</td>'
         + '<td>' + (f.required ? 'Yes' : 'No') + '</td><td>' + relBadge(f.relationshipType) + '</td></tr>');
     });
   });
-  document.getElementById('dict-wrap').innerHTML = '<table><thead><tr><th class="mono">Object</th><th class="mono">Field</th>'
+  $('#dictWrap').innerHTML = '<table><thead><tr><th class="mono">Object</th><th class="mono">Field</th>'
     + '<th>Label</th><th>Type</th><th>Length</th><th>Required</th><th>Relationship</th></tr></thead><tbody>'
     + (rows.join('') || '<tr><td colspan="7" class="empty">No fields match that search</td></tr>') + '</tbody></table>';
 }
@@ -418,15 +462,15 @@ function renderMatrixTable(filter) {
     return !term || (r.sourceObject + ' ' + r.targetObject + ' ' + r.relationshipField).toLowerCase().includes(term);
   }).map(function (r) {
     return '<tr><td class="mono">' + r.sourceObject + '</td><td class="mono">' + r.relationshipField + '</td>'
-      + '<td class="mono">' + r.targetObject + (r.targetInScope ? '' : ' <span class="lbl" style="color:var(--text-faint)">(outside selection)</span>') + '</td>'
+      + '<td class="mono">' + r.targetObject + (r.targetInScope ? '' : ' <span class="lbl" style="color:var(--faint);font-family:Inter,sans-serif">(outside selection)</span>') + '</td>'
       + '<td>' + relBadge(r.relationshipType) + '</td><td class="mono">' + (r.relationshipName || '') + '</td></tr>';
   });
-  document.getElementById('matrix-wrap').innerHTML = '<table><thead><tr><th class="mono">Source object</th><th class="mono">Field</th>'
+  $('#matrixWrap').innerHTML = '<table><thead><tr><th class="mono">Source object</th><th class="mono">Field</th>'
     + '<th class="mono">Target object</th><th>Type</th><th class="mono">Child relationship</th></tr></thead><tbody>'
     + (rows.join('') || '<tr><td colspan="5" class="empty">No relationships match that search</td></tr>') + '</tbody></table>';
 }
 
-// ---------- Export ----------
+/* ---------- Export ---------- */
 async function exportExcel() {
   const wb = new ExcelJS.Workbook();
   const dict = wb.addWorksheet('Data dictionary');
@@ -474,6 +518,7 @@ async function exportExcel() {
 
   const buf = await wb.xlsx.writeBuffer();
   downloadBlob(buf, 'schema-export.xlsx', 'application/octet-stream');
+  toast('Workbook downloaded');
 }
 
 function styleHeader(ws) {
@@ -496,24 +541,25 @@ function exportLucidCsv() {
   allObjects.forEach(function (o) { customByName[o.apiName] = o.custom; });
 
   normalized.objects.forEach(function (o) {
-    const schema = o.custom ? 'Custom' : 'Standard';
+    const schemaName = o.custom ? 'Custom' : 'Standard';
     o.fields.forEach(function (f, idx) {
       const pos = idx + 1;
       if (f.apiName === 'Id') {
-        rows.push(['postgresql', 'SalesforceOrg', schema, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'PRIMARY KEY', '', '', '']);
+        rows.push(['postgresql', 'SalesforceOrg', schemaName, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'PRIMARY KEY', '', '', '']);
       } else if (f.relationshipType && f.referenceTo.length) {
         f.referenceTo.forEach(function (target) {
           const targetSchema = customByName[target] ? 'Custom' : 'Standard';
-          rows.push(['postgresql', 'SalesforceOrg', schema, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'FOREIGN KEY', targetSchema, target, 'Id']);
+          rows.push(['postgresql', 'SalesforceOrg', schemaName, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'FOREIGN KEY', targetSchema, target, 'Id']);
         });
       } else {
-        rows.push(['postgresql', 'SalesforceOrg', schema, o.apiName, f.apiName, pos, f.dataType, f.length || '', '', '', '', '']);
+        rows.push(['postgresql', 'SalesforceOrg', schemaName, o.apiName, f.apiName, pos, f.dataType, f.length || '', '', '', '', '']);
       }
     });
   });
 
   const csv = rows.map(function (r) { return r.map(csvEscape).join(','); }).join('\n');
   downloadBlob(csv, 'schema-erd-import.csv', 'text/csv');
+  toast('Lucidchart CSV downloaded');
 }
 
 function downloadBlob(content, filename, mime) {
@@ -528,99 +574,84 @@ function downloadBlob(content, filename, mime) {
   URL.revokeObjectURL(url);
 }
 
-// ---------- Wiring ----------
-document.getElementById('env-sandbox').addEventListener('click', function () { setEnv('sandbox'); });
-document.getElementById('env-prod').addEventListener('click', function () { setEnv('prod'); });
-function setEnv(e) {
-  env = e;
-  document.getElementById('env-sandbox').classList.toggle('active', e === 'sandbox');
-  document.getElementById('env-prod').classList.toggle('active', e === 'prod');
+/* ---------- Wiring ---------- */
+$('#envSandbox').onclick = function () { setEnvType('sandbox'); };
+$('#envProd').onclick = function () { setEnvType('prod'); };
+function setEnvType(e) {
+  envType = e;
+  $('#envSandbox').classList.toggle('active', e === 'sandbox');
+  $('#envProd').classList.toggle('active', e === 'prod');
 }
 
-document.getElementById('save-key-btn').addEventListener('click', function () {
-  const v = document.getElementById('consumer-key-input').value.trim();
-  if (v) { localStorage.setItem('schema_atlas_key', v); document.getElementById('key-card').style.display = 'none'; }
-});
+$('#connectBtn').onclick = oauthLogin;
 
-document.getElementById('connect-btn').addEventListener('click', startLogin);
-
-document.querySelectorAll('.scope-card').forEach(function (card) {
-  card.addEventListener('click', function () {
-    document.querySelectorAll('.scope-card').forEach(function (c) { c.classList.remove('selected'); });
-    card.classList.add('selected');
-    scope = card.dataset.scope;
-    document.getElementById('subset-panel').classList.toggle('open', scope === 'subset');
+$$('.scope-row [data-scope]').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    $$('.scope-row [data-scope]').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    scope = btn.dataset.scope;
+    $('#scopeHint').textContent = SCOPE_HINT[scope];
+    $('#subsetPanel').classList.toggle('open', scope === 'subset');
   });
 });
 
-document.getElementById('subset-search').addEventListener('input', function (e) { renderSubsetList(e.target.value); });
-document.getElementById('subset-select-all').addEventListener('click', function () {
-  document.querySelectorAll('#subset-list input[type=checkbox]').forEach(function (cb) { cb.checked = true; subsetSelection.add(cb.dataset.api); });
+$('#subsetSearch').addEventListener('input', function (e) { renderSubsetList(e.target.value); });
+$('#subsetSelectAll').addEventListener('click', function () {
+  $$('#subsetList input[type=checkbox]').forEach(function (cb) { cb.checked = true; subsetSelection.add(cb.dataset.api); });
 });
-document.getElementById('subset-clear').addEventListener('click', function () {
+$('#subsetClear').addEventListener('click', function () {
   subsetSelection.clear();
-  renderSubsetList(document.getElementById('subset-search').value);
+  renderSubsetList($('#subsetSearch').value);
 });
 
-document.getElementById('extract-btn').addEventListener('click', async function () {
+$('#extractBtn').addEventListener('click', async function () {
   const targets = objectsInScope();
-  if (!targets.length) { alert('Choose at least one object first.'); return; }
+  if (!targets.length) { toast('Choose at least one object first.'); return; }
   if (scope === 'all' && targets.length > 300) {
     if (!confirm('That is ' + targets.length + ' objects. Large extractions take longer and use more API calls. Continue?')) return;
   }
-  const btn = document.getElementById('extract-btn');
+  const btn = $('#extractBtn');
   btn.disabled = true;
-  const progress = document.getElementById('progress-label');
+  const progress = $('#progressLabel');
   try {
     const describeMap = await describeBatch(targets, function (done, total) {
       progress.textContent = 'Describing ' + done + ' of ' + total + ' objects...';
     });
     normalized = normalize(describeMap);
     progress.textContent = 'Done. ' + Object.keys(describeMap).length + ' of ' + targets.length + ' objects described.';
-    document.getElementById('preview-card').style.display = 'block';
+    $('#previewCard').style.display = 'block';
     renderStats();
     renderDictTable();
     renderMatrixTable();
   } catch (err) {
-    progress.textContent = 'Error: ' + err.message;
+    const cors = /Failed to fetch|NetworkError|TypeError/.test(String(err));
+    progress.textContent = cors ? 'Blocked by CORS — add this origin to Setup -> CORS, then try again.' : 'Error: ' + err.message;
   } finally {
     btn.disabled = false;
   }
 });
 
-document.querySelectorAll('.tab').forEach(function (tab) {
+$$('.lens').forEach(function (tab) {
   tab.addEventListener('click', function () {
-    document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+    $$('.lens').forEach(function (t) { t.classList.remove('active'); });
     tab.classList.add('active');
     activeTab = tab.dataset.tab;
-    document.getElementById('dict-wrap').style.display = activeTab === 'dict' ? 'block' : 'none';
-    document.getElementById('matrix-wrap').style.display = activeTab === 'matrix' ? 'block' : 'none';
+    $('#dictWrap').style.display = activeTab === 'dict' ? 'block' : 'none';
+    $('#matrixWrap').style.display = activeTab === 'matrix' ? 'block' : 'none';
   });
 });
 
-document.getElementById('dict-search').addEventListener('input', function (e) {
-  if (activeTab === 'dict') renderDictTable(e.target.value);
-  else renderMatrixTable(e.target.value);
+$('#tableSearch').addEventListener('input', function (e) {
+  if (activeTab === 'dict') renderDictTable(e.target.value); else renderMatrixTable(e.target.value);
 });
 
-document.getElementById('export-excel-btn').addEventListener('click', exportExcel);
-document.getElementById('export-lucid-btn').addEventListener('click', exportLucidCsv);
+$('#exportExcelBtn').addEventListener('click', exportExcel);
+$('#exportLucidBtn').addEventListener('click', exportLucidCsv);
 
-// ---------- Boot ----------
-(async function init() {
-  if (getConsumerKey()) document.getElementById('key-card').style.display = 'none';
-  if (parseAuthResponse()) {
-    renderConnStatus();
-    try {
-      await loadGlobalDescribe();
-      renderScopeCard();
-    } catch (err) {
-      alert('Connected, but could not load the object list: ' + err.message);
-    }
-  } else {
-    renderConnStatus();
-  }
-})();
+/* ---------- Boot ---------- */
+if (handleOAuthReturn()) {
+  // normal load (not the popup callback) — nothing else to do until Connect is clicked
+}
 </script>
 </body>
 </html>
