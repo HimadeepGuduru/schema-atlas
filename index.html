@@ -176,7 +176,7 @@ let toastT;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3200); }
 
 const API_VERSION = 'v62.0';
-const DEFAULT_CONSUMER_KEY = '3MVG9GCMQoQ6rpzTViwky6e4Z5H5nh_DA.l0ehIFzS0Ocakc_DGmq9dOc35ob2ADS0FcSxpLDwobPftNSB_Yz';
+const DEFAULT_CONSUMER_KEY = '3MVG9rZjd7MXFdLgiaPxll_pcq837b8hXSlXsDBjB226ZRPwYE20E4aih9MQ31KWlQvEcYyNuWd1r_6qxdQ3N';
 const LS_KEY = 'schema_atlas_key';
 const ORGKIT_KEY = 'orgkit_v1';
 function getKey(){ try{ return DEFAULT_CONSUMER_KEY || localStorage.getItem(LS_KEY) || ''; }catch(e){ return DEFAULT_CONSUMER_KEY || ''; } }
