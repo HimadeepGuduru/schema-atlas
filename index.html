@@ -33,103 +33,88 @@
   a{color:var(--accent)}
   button{font-family:inherit}
   ::selection{background:rgba(91,140,255,.35)}
-
-  .top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-    border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));
-    border-radius:var(--r-lg);padding:18px 22px;margin-bottom:18px}
+  .top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));border-radius:var(--r-lg);padding:18px 22px;margin-bottom:18px}
   .brand{display:flex;flex-direction:column;gap:2px}
-  .brand h1{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0;
-    display:flex;align-items:center;gap:10px}
+  .brand h1{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0;display:flex;align-items:center;gap:10px}
   .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--faint)}
   .brand .dot.live{background:var(--ok);box-shadow:0 0 12px var(--ok)}
   .brand p{margin:0;color:var(--muted);font-size:13px}
   .top .spacer{flex:1}
-
   .modebtn{background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 13px;font-family:var(--body);font-size:12.5px;cursor:pointer;transition:.15s}
   .modebtn:hover{border-color:var(--accent);color:var(--text)}
   .modebtn.active{background:var(--accent);border-color:var(--accent);color:#08111f;font-weight:600}
   .env-toggle{display:flex;gap:6px}
-
-  .btn{font-family:var(--disp);font-weight:600;font-size:13.5px;border-radius:9px;padding:10px 18px;cursor:pointer;
-    border:1px solid var(--line);background:var(--raised);color:var(--text);transition:.15s}
+  .btn{font-family:var(--disp);font-weight:600;font-size:13.5px;border-radius:9px;padding:10px 18px;cursor:pointer;border:1px solid var(--line);background:var(--raised);color:var(--text);transition:.15s}
   .btn:hover{border-color:var(--accent)}
   .btn:disabled{opacity:.5;cursor:default}
-  .btn.primary{background:linear-gradient(180deg,#6f9bff,#4d7df0);border-color:#5b8cff;color:#0b1018;
-    box-shadow:0 4px 16px rgba(91,140,255,.3)}
+  .btn.primary{background:linear-gradient(180deg,#6f9bff,#4d7df0);border-color:#5b8cff;color:#0b1018;box-shadow:0 4px 16px rgba(91,140,255,.3)}
   .btn.primary:hover{filter:brightness(1.06)}
   .btn.ghost{background:transparent}
-
   .connstat{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;font-family:var(--mono)}
-
   .panel{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel);padding:20px 22px;margin-bottom:18px}
   .panel h2{font-family:var(--disp);font-size:15px;font-weight:600;margin:0 0 4px}
   .panel .sub{font-size:12px;color:var(--muted);margin:0 0 16px}
-
   .scope-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   #scopeHint{font-size:11.5px;color:var(--faint);margin-left:6px}
-
   .subset-panel{margin-top:14px;display:none}
   .subset-panel.open{display:block}
   .subset-actions{display:flex;gap:14px;margin-bottom:8px}
   .subset-actions a{font-size:12px;color:var(--accent);cursor:pointer}
-  .controls input[type=search]{background:var(--panel-2);border:1px solid var(--line);color:var(--text);
-    border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;width:100%}
+  .controls input[type=search]{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none;width:100%}
   .controls input[type=search]:focus{border-color:var(--accent)}
   #subsetList{max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);margin-top:8px;background:var(--panel-2)}
-  .subset-row{display:flex;align-items:center;gap:9px;padding:7px 10px;font-family:var(--mono);font-size:12px;
-    border-bottom:1px solid var(--line-soft);cursor:pointer}
+  .subset-row{display:flex;align-items:center;gap:9px;padding:7px 10px;font-family:var(--mono);font-size:12px;border-bottom:1px solid var(--line-soft);cursor:pointer}
   .subset-row:last-child{border-bottom:0}
   .subset-row input{accent-color:var(--accent);width:14px;height:14px;flex:0 0 auto}
   .subset-row .lbl{color:var(--muted);font-family:var(--body)}
   .empty{color:var(--faint);font-size:13px;padding:24px;text-align:center}
-
   #progressLabel{font-size:12px;color:var(--accent);font-family:var(--mono);min-height:16px;margin-top:10px}
-
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;display:none}
   .cards.show{display:grid}
   .card{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:14px 16px}
   .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
   .card .v{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:-.02em;margin-top:4px}
-
   .lenses{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
-  .lens{font-family:var(--disp);font-weight:600;font-size:13px;color:var(--muted);background:none;border:0;
-    padding:9px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+  .lens{font-family:var(--disp);font-weight:600;font-size:13px;color:var(--muted);background:none;border:0;padding:9px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
   .lens:hover{color:var(--text)}
   .lens.active{color:var(--text);border-bottom-color:var(--accent)}
-
   .tablewrap{max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:var(--r)}
   table{width:100%;border-collapse:collapse;font-size:12.5px}
-  thead th{text-align:left;font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.05em;
-    text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);
-    background:var(--panel-2);position:sticky;top:0}
+  thead th{text-align:left;font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);background:var(--panel-2);position:sticky;top:0}
   td.mono,th.mono{font-family:var(--mono)}
   tbody td{padding:9px 12px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
   tbody tr:hover{background:var(--panel-2)}
   tbody tr:last-child td{border-bottom:0}
-
   .badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10.5px;font-weight:600;font-family:var(--body)}
   .badge.md{background:rgba(52,211,153,.15);color:var(--ok)}
   .badge.lookup{background:rgba(122,162,255,.15);color:var(--miss)}
   .badge.junction{background:rgba(245,181,61,.15);color:var(--warn)}
-
   .export-row{display:flex;gap:10px;margin-top:16px;align-items:center}
   .export-row .note{font-size:11.5px;color:var(--faint)}
-
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);
-    background:var(--raised);border:1px solid var(--accent);color:var(--text);padding:11px 20px;border-radius:10px;
-    font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.4);transition:transform .3s;z-index:70;max-width:480px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--raised);border:1px solid var(--accent);color:var(--text);padding:11px 20px;border-radius:10px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.4);transition:transform .3s;z-index:70;max-width:480px}
   .toast.show{transform:translateX(-50%) translateY(0)}
-
-  @media (max-width:880px){
-    .cards{grid-template-columns:1fr 1fr}
-    .top{flex-direction:column;align-items:stretch}
-  }
+  @media (max-width:880px){.cards{grid-template-columns:1fr 1fr}.top{flex-direction:column;align-items:stretch}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* OrgKit shared nav */
+  .ok-nav{position:sticky;top:0;z-index:200;background:rgba(11,16,24,0.97);backdrop-filter:blur(8px);border-bottom:1px solid #1a2435;padding:0 20px;height:40px;display:flex;align-items:center;gap:14px}
+  .ok-home{color:#5d6c8a;font-size:12px;text-decoration:none;display:flex;align-items:center;gap:5px;font-family:var(--body)}
+  .ok-home:hover{color:#8595b3}
+  .ok-tool{color:#e8eef9;font-size:12px;font-weight:600;font-family:var(--disp)}
+  .ok-spacer{flex:1}
+  .ok-org{display:none;align-items:center;gap:6px;padding:3px 10px;border-radius:6px;border:1px solid rgba(52,211,153,0.25);background:rgba(52,211,153,0.06)}
+  .ok-org.show{display:flex}
+  .ok-dot{width:5px;height:5px;border-radius:50%;background:#34d399;flex-shrink:0}
+  .ok-orgname{font-family:var(--mono);font-size:11px;color:#34d399}
 </style>
 </head>
 <body>
+<nav class="ok-nav">
+  <a class="ok-home" href="/">← OrgKit</a>
+  <span class="ok-tool">Schema Atlas</span>
+  <div class="ok-spacer"></div>
+  <div class="ok-org" id="okOrgEl"><div class="ok-dot"></div><span class="ok-orgname" id="okOrgName"></span></div>
+</nav>
 <div class="wrap">
-
   <div class="top">
     <div class="brand">
       <h1><span class="dot" id="connDot"></span>Schema Atlas</h1>
@@ -143,7 +128,6 @@
     <button class="btn primary" id="connectBtn">Connect to Salesforce</button>
     <div class="connstat" id="connLabel">Not connected</div>
   </div>
-
   <div class="panel" id="scopeCard" style="display:none">
     <h2>1. Choose what to extract</h2>
     <p class="sub" id="objectCountSub"></p>
@@ -161,14 +145,12 @@
     <div style="margin-top:16px"><button class="btn primary" id="extractBtn">Extract schema</button></div>
     <div id="progressLabel"></div>
   </div>
-
   <div class="cards" id="statsCards">
     <div class="card"><div class="k">Objects</div><div class="v" id="statObjects">0</div></div>
     <div class="card"><div class="k">Fields</div><div class="v" id="statFields">0</div></div>
     <div class="card"><div class="k">Relationships</div><div class="v" id="statRel">0</div></div>
     <div class="card"><div class="k">Likely junctions</div><div class="v" id="statJunction">0</div></div>
   </div>
-
   <div class="panel" id="previewCard" style="display:none">
     <div class="lenses">
       <button class="lens active" data-tab="dict">Data dictionary</button>
@@ -183,20 +165,10 @@
       <span class="note">Both exports run entirely in your browser — nothing is uploaded anywhere.</span>
     </div>
   </div>
-
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
-/*
-  Setup checklist (same pattern as the other tools in the toolkit):
-  1. This page's eventual URL must be added to the shared connected app's OAuth callback URLs.
-  2. The consumer key below is the same public client_id the other tools use — safe to commit,
-     it is not the consumer secret.
-  3. Add this page's origin to Setup -> CORS in every org you plan to connect to.
-*/
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -206,7 +178,15 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('sh
 const API_VERSION = 'v62.0';
 const DEFAULT_CONSUMER_KEY = '3MVG9GCMQoQ6rpzTViwky6e4Z5H5nh_DA.l0ehIFzS0Ocakc_DGmq9dOc35ob2ADS0FcSxpLDwobPftNSB_Yz';
 const LS_KEY = 'schema_atlas_key';
+const ORGKIT_KEY = 'orgkit_v1';
 function getKey(){ try{ return DEFAULT_CONSUMER_KEY || localStorage.getItem(LS_KEY) || ''; }catch(e){ return DEFAULT_CONSUMER_KEY || ''; } }
+function getOrgKitSession(){try{return JSON.parse(localStorage.getItem(ORGKIT_KEY)||'null');}catch(e){return null;}}
+function setOrgKitSession(s){try{localStorage.setItem(ORGKIT_KEY,JSON.stringify(s));}catch(e){}}
+function showOkTopbar(name){
+  const el=document.getElementById('okOrgEl'), nm=document.getElementById('okOrgName');
+  if(el) el.classList.add('show');
+  if(nm) nm.textContent=name;
+}
 
 let envType = 'sandbox';
 let session = { accessToken: null, instanceUrl: null };
@@ -224,7 +204,6 @@ function fetchOrgName(inst){
   } catch (e) { return ''; }
 }
 
-/* ---------- OAuth (User-Agent / implicit) via popup ---------- */
 let pendingConnect = null;
 function oauthLogin(){
   const key = getKey();
@@ -270,22 +249,24 @@ async function finishConnect(inst, token){
   session.accessToken = token;
   session.instanceUrl = inst;
   const orgLabel = fetchOrgName(inst);
+  const _loginBase = envType === 'sandbox' ? 'https://test.salesforce.com' : 'https://login.salesforce.com';
+  setOrgKitSession({accessToken:token, instanceUrl:inst, name:orgLabel||'Schema Atlas Org', loginBase:_loginBase, connectedAt:Date.now()});
   $('#connDot').classList.add('live');
-  $('#connLabel').textContent = '\u23F3 loading objects\u2026';
+  $('#connLabel').textContent = '⏳ loading objects…';
   try {
     await loadGlobalDescribe();
     $('#connLabel').textContent = 'Connected to ' + orgLabel;
+    showOkTopbar(orgLabel);
     renderScopeCard();
   } catch (err) {
     const cors = /Failed to fetch|NetworkError|TypeError/.test(String(err));
-    $('#connLabel').textContent = cors ? '\u2717 read blocked \u2014 add CORS' : '\u2717 ' + (err.message || err);
+    $('#connLabel').textContent = cors ? '✗ read blocked — add CORS' : '✗ ' + (err.message || err);
     toast(cors
-      ? 'Logged in, but blocked by CORS \u2014 add ' + location.origin + ' to the org\u2019s CORS allowlist (Setup \u2192 CORS), then connect again.'
+      ? 'CORS not configured — run the Apex snippet on OrgKit home once. It covers all OrgKit tools on this domain.'
       : 'Failed: ' + (err.message || err));
   }
 }
 
-/* ---------- Salesforce REST helpers ---------- */
 async function sfFetch(path, options) {
   options = options || {};
   const res = await fetch(session.instanceUrl + path, {
@@ -317,86 +298,49 @@ async function describeBatch(apiNames, onProgress) {
   const chunks = [];
   for (let i = 0; i < apiNames.length; i += 25) chunks.push(apiNames.slice(i, i + 25));
   const results = {};
-  let nextChunk = 0;
-  let done = 0;
-
+  let nextChunk = 0, done = 0;
   async function worker() {
     while (nextChunk < chunks.length) {
       const chunk = chunks[nextChunk++];
-      const body = JSON.stringify({
-        batchRequests: chunk.map(function (name) {
-          return { method: 'GET', url: API_VERSION + '/sobjects/' + name + '/describe' };
-        })
-      });
+      const body = JSON.stringify({ batchRequests: chunk.map(function (name) { return { method: 'GET', url: API_VERSION + '/sobjects/' + name + '/describe' }; }) });
       const resp = await sfFetch('/services/data/' + API_VERSION + '/composite/batch', { method: 'POST', body: body });
-      resp.results.forEach(function (r, i) {
-        if (r.statusCode === 200) results[chunk[i]] = r.result;
-      });
+      resp.results.forEach(function (r, i) { if (r.statusCode === 200) results[chunk[i]] = r.result; });
       done += chunk.length;
       if (onProgress) onProgress(Math.min(done, apiNames.length), apiNames.length);
     }
   }
-
-  const workerCount = Math.min(5, chunks.length || 1);
-  await Promise.all(Array.from({ length: workerCount }, worker));
+  await Promise.all(Array.from({ length: Math.min(5, chunks.length || 1) }, worker));
   return results;
 }
 
-/* ---------- Normalization ---------- */
 function deriveRelationshipType(field) {
   if (field.type !== 'reference') return null;
   return field.cascadeDelete ? 'MasterDetail' : 'Lookup';
 }
 
 function normalize(describeMap) {
-  const objects = [];
-  const relationships = [];
-  const inScope = new Set(Object.keys(describeMap));
-
+  const objects = [], relationships = [], inScope = new Set(Object.keys(describeMap));
   Object.keys(describeMap).forEach(function (apiName) {
     const d = describeMap[apiName];
     const fields = d.fields.map(function (f) {
-      return {
-        apiName: f.name, label: f.label, dataType: f.type,
-        length: f.length || null, precision: f.precision || null, scale: f.scale || null,
-        required: f.nillable === false, custom: f.custom,
-        referenceTo: f.referenceTo || [], relationshipName: f.relationshipName || null,
-        relationshipType: deriveRelationshipType(f)
-      };
+      return { apiName: f.name, label: f.label, dataType: f.type, length: f.length || null, precision: f.precision || null, scale: f.scale || null, required: f.nillable === false, custom: f.custom, referenceTo: f.referenceTo || [], relationshipName: f.relationshipName || null, relationshipType: deriveRelationshipType(f) };
     });
     objects.push({ apiName: d.name, label: d.label, custom: d.custom, keyPrefix: d.keyPrefix, fields: fields });
-
     fields.filter(function (f) { return f.relationshipType; }).forEach(function (f) {
-      f.referenceTo.forEach(function (target) {
-        relationships.push({
-          sourceObject: apiName, relationshipField: f.apiName, targetObject: target,
-          relationshipType: f.relationshipType, relationshipName: f.relationshipName,
-          targetInScope: inScope.has(target)
-        });
-      });
+      f.referenceTo.forEach(function (target) { relationships.push({ sourceObject: apiName, relationshipField: f.apiName, targetObject: target, relationshipType: f.relationshipType, relationshipName: f.relationshipName, targetInScope: inScope.has(target) }); });
     });
   });
-
   const byObject = {};
-  relationships.forEach(function (r) {
-    byObject[r.sourceObject] = byObject[r.sourceObject] || [];
-    byObject[r.sourceObject].push(r);
-  });
+  relationships.forEach(function (r) { byObject[r.sourceObject] = byObject[r.sourceObject] || []; byObject[r.sourceObject].push(r); });
   objects.forEach(function (o) {
     const rels = byObject[o.apiName] || [];
     const parents = new Set(rels.filter(function (r) { return r.relationshipType === 'MasterDetail'; }).map(function (r) { return r.targetObject; }));
     o.isJunctionCandidate = parents.size >= 2;
   });
-
   return { objects: objects, relationships: relationships };
 }
 
-/* ---------- Rendering ---------- */
-const SCOPE_HINT = {
-  custom: 'Anything ending in __c.',
-  all: 'Every object you can see. Slower for large orgs.',
-  subset: 'Pick objects by name below.'
-};
+const SCOPE_HINT = { custom: 'Anything ending in __c.', all: 'Every object you can see. Slower for large orgs.', subset: 'Pick objects by name below.' };
 
 function renderScopeCard() {
   $('#scopeCard').style.display = 'block';
@@ -406,22 +350,13 @@ function renderScopeCard() {
 }
 
 function renderSubsetList(filter) {
-  const list = $('#subsetList');
-  const term = (filter || '').toLowerCase();
-  const visible = allObjects.filter(function (o) {
-    return !term || o.apiName.toLowerCase().includes(term) || o.label.toLowerCase().includes(term);
-  });
+  const list = $('#subsetList'), term = (filter || '').toLowerCase();
+  const visible = allObjects.filter(function (o) { return !term || o.apiName.toLowerCase().includes(term) || o.label.toLowerCase().includes(term); });
   list.innerHTML = visible.map(function (o) {
     const checked = subsetSelection.has(o.apiName) ? 'checked' : '';
-    return '<label class="subset-row"><input type="checkbox" data-api="' + o.apiName + '" ' + checked + '>'
-      + '<span>' + o.apiName + '</span><span class="lbl">' + esc(o.label) + '</span></label>';
+    return '<label class="subset-row"><input type="checkbox" data-api="' + o.apiName + '" ' + checked + '><span>' + o.apiName + '</span><span class="lbl">' + esc(o.label) + '</span></label>';
   }).join('') || '<div class="empty">No objects match that search</div>';
-  list.querySelectorAll('input[type=checkbox]').forEach(function (cb) {
-    cb.addEventListener('change', function () {
-      if (cb.checked) subsetSelection.add(cb.dataset.api);
-      else subsetSelection.delete(cb.dataset.api);
-    });
-  });
+  list.querySelectorAll('input[type=checkbox]').forEach(function (cb) { cb.addEventListener('change', function () { if (cb.checked) subsetSelection.add(cb.dataset.api); else subsetSelection.delete(cb.dataset.api); }); });
 }
 
 function renderStats() {
@@ -439,83 +374,35 @@ function relBadge(type) {
 }
 
 function renderDictTable(filter) {
-  const term = (filter || '').toLowerCase();
-  const rows = [];
+  const term = (filter || '').toLowerCase(), rows = [];
   normalized.objects.forEach(function (o) {
     o.fields.forEach(function (f) {
       const hay = (o.apiName + ' ' + f.apiName + ' ' + f.dataType).toLowerCase();
       if (term && !hay.includes(term)) return;
-      rows.push('<tr><td class="mono">' + o.apiName + (o.isJunctionCandidate ? ' <span class="badge junction">junction?</span>' : '') + '</td>'
-        + '<td class="mono">' + f.apiName + '</td><td>' + esc(f.label) + '</td><td>' + f.dataType + '</td>'
-        + '<td>' + (f.length || (f.precision ? f.precision + ',' + f.scale : '')) + '</td>'
-        + '<td>' + (f.required ? 'Yes' : 'No') + '</td><td>' + relBadge(f.relationshipType) + '</td></tr>');
+      rows.push('<tr><td class="mono">' + o.apiName + (o.isJunctionCandidate ? ' <span class="badge junction">junction?</span>' : '') + '</td><td class="mono">' + f.apiName + '</td><td>' + esc(f.label) + '</td><td>' + f.dataType + '</td><td>' + (f.length || (f.precision ? f.precision + ',' + f.scale : '')) + '</td><td>' + (f.required ? 'Yes' : 'No') + '</td><td>' + relBadge(f.relationshipType) + '</td></tr>');
     });
   });
-  $('#dictWrap').innerHTML = '<table><thead><tr><th class="mono">Object</th><th class="mono">Field</th>'
-    + '<th>Label</th><th>Type</th><th>Length</th><th>Required</th><th>Relationship</th></tr></thead><tbody>'
-    + (rows.join('') || '<tr><td colspan="7" class="empty">No fields match that search</td></tr>') + '</tbody></table>';
+  $('#dictWrap').innerHTML = '<table><thead><tr><th class="mono">Object</th><th class="mono">Field</th><th>Label</th><th>Type</th><th>Length</th><th>Required</th><th>Relationship</th></tr></thead><tbody>' + (rows.join('') || '<tr><td colspan="7" class="empty">No fields match</td></tr>') + '</tbody></table>';
 }
 
 function renderMatrixTable(filter) {
   const term = (filter || '').toLowerCase();
-  const rows = normalized.relationships.filter(function (r) {
-    return !term || (r.sourceObject + ' ' + r.targetObject + ' ' + r.relationshipField).toLowerCase().includes(term);
-  }).map(function (r) {
-    return '<tr><td class="mono">' + r.sourceObject + '</td><td class="mono">' + r.relationshipField + '</td>'
-      + '<td class="mono">' + r.targetObject + (r.targetInScope ? '' : ' <span class="lbl" style="color:var(--faint);font-family:Inter,sans-serif">(outside selection)</span>') + '</td>'
-      + '<td>' + relBadge(r.relationshipType) + '</td><td class="mono">' + (r.relationshipName || '') + '</td></tr>';
+  const rows = normalized.relationships.filter(function (r) { return !term || (r.sourceObject + ' ' + r.targetObject + ' ' + r.relationshipField).toLowerCase().includes(term); }).map(function (r) {
+    return '<tr><td class="mono">' + r.sourceObject + '</td><td class="mono">' + r.relationshipField + '</td><td class="mono">' + r.targetObject + (r.targetInScope ? '' : ' <span class="lbl" style="color:var(--faint);font-family:Inter,sans-serif">(outside selection)</span>') + '</td><td>' + relBadge(r.relationshipType) + '</td><td class="mono">' + (r.relationshipName || '') + '</td></tr>';
   });
-  $('#matrixWrap').innerHTML = '<table><thead><tr><th class="mono">Source object</th><th class="mono">Field</th>'
-    + '<th class="mono">Target object</th><th>Type</th><th class="mono">Child relationship</th></tr></thead><tbody>'
-    + (rows.join('') || '<tr><td colspan="5" class="empty">No relationships match that search</td></tr>') + '</tbody></table>';
+  $('#matrixWrap').innerHTML = '<table><thead><tr><th class="mono">Source object</th><th class="mono">Field</th><th class="mono">Target object</th><th>Type</th><th class="mono">Child relationship</th></tr></thead><tbody>' + (rows.join('') || '<tr><td colspan="5" class="empty">No relationships match</td></tr>') + '</tbody></table>';
 }
 
-/* ---------- Export ---------- */
 async function exportExcel() {
   const wb = new ExcelJS.Workbook();
   const dict = wb.addWorksheet('Data dictionary');
-  dict.columns = [
-    { header: 'Object API name', key: 'obj', width: 28 },
-    { header: 'Object label', key: 'objLabel', width: 24 },
-    { header: 'Field API name', key: 'field', width: 30 },
-    { header: 'Field label', key: 'fieldLabel', width: 24 },
-    { header: 'Data type', key: 'type', width: 14 },
-    { header: 'Length / precision', key: 'len', width: 16 },
-    { header: 'Required', key: 'req', width: 10 },
-    { header: 'Relationship type', key: 'relType', width: 16 }
-  ];
-  normalized.objects.forEach(function (o) {
-    o.fields.forEach(function (f) {
-      dict.addRow({
-        obj: o.apiName, objLabel: o.label, field: f.apiName, fieldLabel: f.label, type: f.dataType,
-        len: f.length || (f.precision ? f.precision + ',' + f.scale : ''),
-        req: f.required ? 'Yes' : 'No', relType: f.relationshipType || ''
-      });
-    });
-  });
+  dict.columns = [{ header: 'Object API name', key: 'obj', width: 28 },{ header: 'Object label', key: 'objLabel', width: 24 },{ header: 'Field API name', key: 'field', width: 30 },{ header: 'Field label', key: 'fieldLabel', width: 24 },{ header: 'Data type', key: 'type', width: 14 },{ header: 'Length / precision', key: 'len', width: 16 },{ header: 'Required', key: 'req', width: 10 },{ header: 'Relationship type', key: 'relType', width: 16 }];
+  normalized.objects.forEach(function (o) { o.fields.forEach(function (f) { dict.addRow({ obj: o.apiName, objLabel: o.label, field: f.apiName, fieldLabel: f.label, type: f.dataType, len: f.length || (f.precision ? f.precision + ',' + f.scale : ''), req: f.required ? 'Yes' : 'No', relType: f.relationshipType || '' }); }); });
   styleHeader(dict);
-
   const matrix = wb.addWorksheet('Relationship matrix');
-  matrix.columns = [
-    { header: 'Source object', key: 'src', width: 26 },
-    { header: 'Relationship field', key: 'field', width: 28 },
-    { header: 'Target object', key: 'tgt', width: 26 },
-    { header: 'Relationship type', key: 'type', width: 16 },
-    { header: 'Child relationship name', key: 'rel', width: 26 },
-    { header: 'Target in selection', key: 'inScope', width: 18 }
-  ];
-  normalized.relationships.forEach(function (r) {
-    const row = matrix.addRow({
-      src: r.sourceObject, field: r.relationshipField, tgt: r.targetObject,
-      type: r.relationshipType, rel: r.relationshipName || '', inScope: r.targetInScope ? 'Yes' : 'No'
-    });
-    row.getCell('type').fill = {
-      type: 'pattern', pattern: 'solid',
-      fgColor: { argb: r.relationshipType === 'MasterDetail' ? 'FFE3F3EA' : 'FFEAF0FB' }
-    };
-  });
+  matrix.columns = [{ header: 'Source object', key: 'src', width: 26 },{ header: 'Relationship field', key: 'field', width: 28 },{ header: 'Target object', key: 'tgt', width: 26 },{ header: 'Relationship type', key: 'type', width: 16 },{ header: 'Child relationship name', key: 'rel', width: 26 },{ header: 'Target in selection', key: 'inScope', width: 18 }];
+  normalized.relationships.forEach(function (r) { const row = matrix.addRow({ src: r.sourceObject, field: r.relationshipField, tgt: r.targetObject, type: r.relationshipType, rel: r.relationshipName || '', inScope: r.targetInScope ? 'Yes' : 'No' }); row.getCell('type').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: r.relationshipType === 'MasterDetail' ? 'FFE3F3EA' : 'FFEAF0FB' } }; });
   styleHeader(matrix);
-
   const buf = await wb.xlsx.writeBuffer();
   downloadBlob(buf, 'schema-export.xlsx', 'application/octet-stream');
   toast('Workbook downloaded');
@@ -529,34 +416,21 @@ function styleHeader(ws) {
   ws.autoFilter = { from: 'A1', to: { row: 1, column: ws.columns.length } };
 }
 
-function csvEscape(v) {
-  const s = String(v == null ? '' : v);
-  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-}
+function csvEscape(v) { const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 
 function exportLucidCsv() {
-  const rows = [['dbms', 'TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME', 'COLUMN_NAME', 'ORDINAL_POSITION', 'DATA_TYPE',
-    'CHARACTER_MAXIMUM_LENGTH', 'CONSTRAINT_TYPE', 'TABLE_SCHEMA', 'TABLE_NAME', 'COLUMN_NAME']];
+  const rows = [['dbms','TABLE_CATALOG','TABLE_SCHEMA','TABLE_NAME','COLUMN_NAME','ORDINAL_POSITION','DATA_TYPE','CHARACTER_MAXIMUM_LENGTH','CONSTRAINT_TYPE','TABLE_SCHEMA','TABLE_NAME','COLUMN_NAME']];
   const customByName = {};
   allObjects.forEach(function (o) { customByName[o.apiName] = o.custom; });
-
   normalized.objects.forEach(function (o) {
     const schemaName = o.custom ? 'Custom' : 'Standard';
     o.fields.forEach(function (f, idx) {
       const pos = idx + 1;
-      if (f.apiName === 'Id') {
-        rows.push(['postgresql', 'SalesforceOrg', schemaName, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'PRIMARY KEY', '', '', '']);
-      } else if (f.relationshipType && f.referenceTo.length) {
-        f.referenceTo.forEach(function (target) {
-          const targetSchema = customByName[target] ? 'Custom' : 'Standard';
-          rows.push(['postgresql', 'SalesforceOrg', schemaName, o.apiName, f.apiName, pos, f.dataType, f.length || 18, 'FOREIGN KEY', targetSchema, target, 'Id']);
-        });
-      } else {
-        rows.push(['postgresql', 'SalesforceOrg', schemaName, o.apiName, f.apiName, pos, f.dataType, f.length || '', '', '', '', '']);
-      }
+      if (f.apiName === 'Id') { rows.push(['postgresql','SalesforceOrg',schemaName,o.apiName,f.apiName,pos,f.dataType,f.length||18,'PRIMARY KEY','','','']); }
+      else if (f.relationshipType && f.referenceTo.length) { f.referenceTo.forEach(function (target) { rows.push(['postgresql','SalesforceOrg',schemaName,o.apiName,f.apiName,pos,f.dataType,f.length||18,'FOREIGN KEY',customByName[target]?'Custom':'Standard',target,'Id']); }); }
+      else { rows.push(['postgresql','SalesforceOrg',schemaName,o.apiName,f.apiName,pos,f.dataType,f.length||'','','','','']); }
     });
   });
-
   const csv = rows.map(function (r) { return r.map(csvEscape).join(','); }).join('\n');
   downloadBlob(csv, 'schema-erd-import.csv', 'text/csv');
   toast('Lucidchart CSV downloaded');
@@ -566,91 +440,67 @@ function downloadBlob(content, filename, mime) {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
 
-/* ---------- Wiring ---------- */
 $('#envSandbox').onclick = function () { setEnvType('sandbox'); };
 $('#envProd').onclick = function () { setEnvType('prod'); };
-function setEnvType(e) {
-  envType = e;
-  $('#envSandbox').classList.toggle('active', e === 'sandbox');
-  $('#envProd').classList.toggle('active', e === 'prod');
-}
-
+function setEnvType(e) { envType = e; $('#envSandbox').classList.toggle('active', e === 'sandbox'); $('#envProd').classList.toggle('active', e === 'prod'); }
 $('#connectBtn').onclick = oauthLogin;
 
 $$('.scope-row [data-scope]').forEach(function (btn) {
   btn.addEventListener('click', function () {
     $$('.scope-row [data-scope]').forEach(function (b) { b.classList.remove('active'); });
-    btn.classList.add('active');
-    scope = btn.dataset.scope;
+    btn.classList.add('active'); scope = btn.dataset.scope;
     $('#scopeHint').textContent = SCOPE_HINT[scope];
     $('#subsetPanel').classList.toggle('open', scope === 'subset');
   });
 });
 
 $('#subsetSearch').addEventListener('input', function (e) { renderSubsetList(e.target.value); });
-$('#subsetSelectAll').addEventListener('click', function () {
-  $$('#subsetList input[type=checkbox]').forEach(function (cb) { cb.checked = true; subsetSelection.add(cb.dataset.api); });
-});
-$('#subsetClear').addEventListener('click', function () {
-  subsetSelection.clear();
-  renderSubsetList($('#subsetSearch').value);
-});
+$('#subsetSelectAll').addEventListener('click', function () { $$('#subsetList input[type=checkbox]').forEach(function (cb) { cb.checked = true; subsetSelection.add(cb.dataset.api); }); });
+$('#subsetClear').addEventListener('click', function () { subsetSelection.clear(); renderSubsetList($('#subsetSearch').value); });
 
 $('#extractBtn').addEventListener('click', async function () {
   const targets = objectsInScope();
   if (!targets.length) { toast('Choose at least one object first.'); return; }
-  if (scope === 'all' && targets.length > 300) {
-    if (!confirm('That is ' + targets.length + ' objects. Large extractions take longer and use more API calls. Continue?')) return;
-  }
-  const btn = $('#extractBtn');
-  btn.disabled = true;
+  if (scope === 'all' && targets.length > 300 && !confirm('That is ' + targets.length + ' objects. Continue?')) return;
+  const btn = $('#extractBtn'); btn.disabled = true;
   const progress = $('#progressLabel');
   try {
-    const describeMap = await describeBatch(targets, function (done, total) {
-      progress.textContent = 'Describing ' + done + ' of ' + total + ' objects...';
-    });
+    const describeMap = await describeBatch(targets, function (done, total) { progress.textContent = 'Describing ' + done + ' of ' + total + ' objects...'; });
     normalized = normalize(describeMap);
     progress.textContent = 'Done. ' + Object.keys(describeMap).length + ' of ' + targets.length + ' objects described.';
     $('#previewCard').style.display = 'block';
-    renderStats();
-    renderDictTable();
-    renderMatrixTable();
+    renderStats(); renderDictTable(); renderMatrixTable();
   } catch (err) {
     const cors = /Failed to fetch|NetworkError|TypeError/.test(String(err));
-    progress.textContent = cors ? 'Blocked by CORS — add this origin to Setup -> CORS, then try again.' : 'Error: ' + err.message;
-  } finally {
-    btn.disabled = false;
-  }
+    progress.textContent = cors ? 'CORS not configured — run Apex once on OrgKit home, covers all OrgKit tools.' : 'Error: ' + err.message;
+  } finally { btn.disabled = false; }
 });
 
 $$('.lens').forEach(function (tab) {
   tab.addEventListener('click', function () {
     $$('.lens').forEach(function (t) { t.classList.remove('active'); });
-    tab.classList.add('active');
-    activeTab = tab.dataset.tab;
+    tab.classList.add('active'); activeTab = tab.dataset.tab;
     $('#dictWrap').style.display = activeTab === 'dict' ? 'block' : 'none';
     $('#matrixWrap').style.display = activeTab === 'matrix' ? 'block' : 'none';
   });
 });
 
-$('#tableSearch').addEventListener('input', function (e) {
-  if (activeTab === 'dict') renderDictTable(e.target.value); else renderMatrixTable(e.target.value);
-});
-
+$('#tableSearch').addEventListener('input', function (e) { if (activeTab === 'dict') renderDictTable(e.target.value); else renderMatrixTable(e.target.value); });
 $('#exportExcelBtn').addEventListener('click', exportExcel);
 $('#exportLucidBtn').addEventListener('click', exportLucidCsv);
 
-/* ---------- Boot ---------- */
+/* Boot */
 if (handleOAuthReturn()) {
-  // normal load (not the popup callback) — nothing else to do until Connect is clicked
+  const _oks = getOrgKitSession();
+  if (_oks && _oks.accessToken && _oks.instanceUrl) {
+    setEnvType(_oks.loginBase && _oks.loginBase.includes('test') ? 'sandbox' : 'prod');
+    finishConnect(_oks.instanceUrl, _oks.accessToken);
+  }
 }
 </script>
 </body>
